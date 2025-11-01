@@ -1,7 +1,24 @@
+# Core
+python-dotenv
+
+# LangChain
 langchain
 langchain-community
 langchain-openai
+langchain-text-splitters
+
+# Vector Database
 chromadb
+
+# OpenAI
 openai
-python-dotenv
-tiktoken
+
+# Gmail API
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+
+# FastAPI
+fastapi
+uvicorn[standard]

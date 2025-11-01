@@ -1,1 +1,37 @@
+# Environment variables
 .env
+
+# OAuth credentials and tokens
+credentials.json
+token.pickle
+
+# Vector database
+chroma_db/
+chroma.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data files
+data/*.txt
+
+# Logs
+*.log
