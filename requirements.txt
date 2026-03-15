@@ -5,12 +5,13 @@ python-dotenv
 langchain
 langchain-community
 langchain-openai
+langchain-chroma
 langchain-text-splitters
 
 # Vector Database
 chromadb
 
-# OpenAI
+# OpenAI (used by GitHub Models via Azure endpoint)
 openai
 
 # Gmail API
@@ -23,4 +24,5 @@ google-api-python-client
 fastapi
 uvicorn[standard]
 
+# HTML parsing
 beautifulsoup4==4.12.2

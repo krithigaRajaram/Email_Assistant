@@ -8,6 +8,7 @@ token.pickle
 # Vector database
 chroma_db/
 chroma.sqlite3
+processed_ids.json
 
 # Python
 __pycache__/
