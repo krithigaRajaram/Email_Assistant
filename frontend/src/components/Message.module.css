@@ -1,0 +1,98 @@
+.message {
+  display: flex; flex-direction: column; gap: 6px;
+  animation: slideUp 0.22s ease-out;
+  max-width: 780px; width: 100%;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.message.user { align-self: flex-end; align-items: flex-end; }
+.message.bot  { align-self: flex-start; align-items: flex-start; }
+
+.bubble {
+  padding: 13px 17px;
+  border-radius: var(--radius);
+  line-height: 1.7;
+  max-width: 680px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 14px;
+}
+
+.message.user .bubble {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-bottom-right-radius: 4px;
+}
+
+.message.bot .bubble {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+/* Actions row */
+.meta {
+  display: flex; gap: 6px; align-items: center;
+  padding: 0 2px;
+  opacity: 0; transition: opacity 0.15s;
+}
+.message:hover .meta { opacity: 1; }
+
+.actionBtn {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.actionBtn:hover { border-color: var(--accent); color: var(--accent); }
+.actionBtn.copied { border-color: var(--accent2); color: var(--accent2); }
+.actionBtn.active { border-color: var(--accent); color: var(--accent); }
+
+/* Sources */
+.sourcesPanel {
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-width: 680px;
+  animation: slideUp 0.18s ease-out;
+}
+
+.sourceCard {
+  padding: 8px 10px;
+  border-left: 2px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 6px 6px 0;
+}
+
+.sourceSubject {
+  font-size: 12px; font-weight: 500; color: var(--text);
+  margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.sourceMeta {
+  font-size: 11px; color: var(--muted);
+  display: flex; gap: 6px; align-items: center;
+}
+
+.dot { opacity: 0.4; }
+
+.sourceSnippet {
+  font-size: 11px; color: var(--muted);
+  margin-top: 5px; line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

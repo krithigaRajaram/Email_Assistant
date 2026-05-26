@@ -2,6 +2,7 @@ import base64
 import os
 import pickle
 import re
+from datetime import datetime, timedelta
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -14,6 +15,8 @@ try:
 except ImportError:
     BS4_AVAILABLE = False
     print("Warning: BeautifulSoup not installed. Run: pip install beautifulsoup4")
+
+MAX_EMAILS = 3000  # hard cap per user
 
 
 class GmailFetcher:
@@ -37,30 +40,36 @@ class GmailFetcher:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     "credentials.json", self.SCOPES
                 )
-                try:
-                    creds = flow.run_local_server(port=0)
-                except Exception:
-                    creds = flow.run_console()
+                creds = flow.run_local_server(port=8080, open_browser=True)
 
             with open("token.pickle", "wb") as f:
                 pickle.dump(creds, f)
 
         return build("gmail", "v1", credentials=creds)
 
-    def fetch_all_emails(self, batch_size=100):
+    def fetch_all_emails(self, batch_size=100, max_emails=MAX_EMAILS, days=365):
         """
-        Fetch ALL emails incrementally using Gmail pagination.
-        Yields emails one page at a time so caller can process/store them in batches.
+        Fetch emails from the past `days` days, up to `max_emails` total.
+        Yields one batch at a time for incremental processing.
         """
         page_token = None
         total_fetched = 0
 
-        print("Starting full email fetch (all mail)...")
+        # Build Gmail date query: emails after (today - days)
+        after_date = (datetime.now() - timedelta(days=days)).strftime("%Y/%m/%d")
+        query = f"after:{after_date}"
 
-        while True:
+        print(f"Fetching emails from the past {days} days (limit: {max_emails})...")
+        print(f"  Gmail query: {query}")
+
+        while total_fetched < max_emails:
+            remaining = max_emails - total_fetched
+            fetch_size = min(batch_size, remaining)
+
             params = {
                 "userId": "me",
-                "maxResults": batch_size,
+                "maxResults": fetch_size,
+                "q": query,
                 "includeSpamTrash": False,
             }
             if page_token:
@@ -74,27 +83,34 @@ class GmailFetcher:
 
             batch_emails = []
             for msg in messages:
+                if total_fetched + len(batch_emails) >= max_emails:
+                    break
                 email_data = self._get_email_content(msg["id"])
                 if email_data:
                     batch_emails.append(email_data)
 
             total_fetched += len(batch_emails)
-            print(f"  Fetched {total_fetched} emails so far...")
+            print(f"  Fetched {total_fetched}/{max_emails} emails...")
 
             yield batch_emails
 
             page_token = results.get("nextPageToken")
-            if not page_token:
+            if not page_token or total_fetched >= max_emails:
                 break
 
         print(f"Done. Total emails fetched: {total_fetched}")
 
-    def fetch_emails(self, max_results=500, query=""):
-        """Fetch a fixed number of emails (used for quick loads)."""
+    def fetch_emails(self, max_results=500, query="", days=365):
+        """Fetch a fixed number of emails from the past `days` days."""
+        after_date = (datetime.now() - timedelta(days=days)).strftime("%Y/%m/%d")
+        date_query = f"after:{after_date}"
+        combined_query = f"{date_query} {query}".strip()
+        max_results = min(max_results, MAX_EMAILS)
+
         results = self.service.users().messages().list(
             userId="me",
             maxResults=max_results,
-            q=query,
+            q=combined_query,
             includeSpamTrash=False,
         ).execute()
 

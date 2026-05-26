@@ -25,6 +25,8 @@ CHROMA_DIR = "./chroma_db"
 PROGRESS_FILE = "./processed_ids.json"  # tracks already-stored email IDs
 EMBED_BATCH_SIZE = 25   # reduced batch size to avoid rate limits
 EMBED_DELAY = 5.0       # seconds between embedding batches
+MAX_EMAILS = 3000      # cap per user
+LOOKBACK_DAYS = 365    # fetch emails from the past 1 year
 
 
 def load_progress():
@@ -131,7 +133,14 @@ def main():
     total_skipped = 0
 
     # Fetch and process all emails page by page
-    for email_batch in fetcher.fetch_all_emails(batch_size=100):
+    print(f"Limit  : {MAX_EMAILS} emails / past {LOOKBACK_DAYS} days")
+    print()
+
+    for email_batch in fetcher.fetch_all_emails(
+        batch_size=100,
+        max_emails=MAX_EMAILS,
+        days=LOOKBACK_DAYS,
+    ):
 
         # Filter out already-processed emails
         new_emails = [e for e in email_batch if e["id"] not in processed_ids]
@@ -159,6 +168,11 @@ def main():
         save_progress(processed_ids)
 
         total_stored += len(new_emails)
+
+        # Stop if we've hit the global cap
+        if len(processed_ids) >= MAX_EMAILS:
+            print(f"  Reached {MAX_EMAILS}-email limit. Stopping.")
+            break
 
     print()
     print("=" * 50)

@@ -49,8 +49,6 @@ async def lifespan(app: FastAPI):
     # cleanup (nothing needed for Chroma)
 
 
-# ── App ────────────────────────────────────────────────────────────────────────
-
 app = FastAPI(title="Email RAG API", version="2.0.0", lifespan=lifespan)
 
 app.add_middleware(
@@ -62,7 +60,6 @@ app.add_middleware(
 )
 
 
-# ── Schemas ────────────────────────────────────────────────────────────────────
 
 class QueryRequest(BaseModel):
     question: str
@@ -82,7 +79,6 @@ class QueryResponse(BaseModel):
     sources: List[dict]
 
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
 
 def detect_counting_question(question: str) -> bool:
     keywords = ["how many", "count", "total", "number of", "how much", "sum", "list all", "all emails"]
