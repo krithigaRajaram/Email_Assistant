@@ -1,4 +1,5 @@
-import styles from './Sidebar.module.css'
+import styles from '../styles/Sidebar.module.css'
+import logo from '../assets/logo.png'
 
 const SUGGESTIONS = [
   { label: 'Recent emails',       q: 'What are the most recent emails I received?' },
@@ -15,8 +16,8 @@ export default function Sidebar({ status, vectorCount, onSuggestion }) {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logo}>
-        <span className={styles.logoIcon}>✦</span>
-        <span className={styles.logoText}>Inbox Intel</span>
+        <img src={logo} alt="MailMate AI" className={styles.logoImg} />
+        <span className={styles.logoText}>MailMate AI</span>
       </div>
 
       <div className={styles.section}>

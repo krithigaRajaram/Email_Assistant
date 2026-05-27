@@ -1,0 +1,122 @@
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  height: 100vh;
+  z-index: 1;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 36px;
+  padding: 0 8px;
+  overflow: hidden;        /* prevent blowout */
+}
+
+.logoImg {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.logoText {
+  font-family: var(--font-head);
+  font-size: 16px;         /* slightly smaller to fit */
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  white-space: nowrap;     /* text stays on one line */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logoIcon {
+  color: var(--accent);
+  font-size: 20px;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+.section {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sectionLabel {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 8px;
+  margin-bottom: 10px;
+}
+
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.chip {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.4;
+}
+
+.chip:hover {
+  background: var(--surface2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.chip:active {
+  transform: scale(0.98);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex-shrink: 0;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.dot.online     { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+.dot.error      { background: #ff4747;       box-shadow: 0 0 6px #ff4747; }
+.dot.connecting { background: var(--muted); }
+
+.statusText {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+}

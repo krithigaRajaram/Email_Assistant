@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import styles from './Message.module.css'
+import styles from '../styles/Message.module.css'
 
 export default function Message({ role, text, sources = [] }) {
   const [copied,       setCopied]       = useState(false)

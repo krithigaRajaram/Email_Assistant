@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import Chat from './components/Chat'
 import useApi from './hooks/useApi'
-import './index.css'
-import './App.css'
+import './styles/index.css'
+import './styles/App.css'
 
 export default function App() {
   const { status, vectorCount } = useApi()

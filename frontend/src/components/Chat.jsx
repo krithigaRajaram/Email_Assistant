@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import useApi from '../hooks/useApi'
 import Message from './Message'
-import styles from './Chat.module.css'
+import styles from '../styles/Chat.module.css'
 
 export default function Chat({ messages, setMessages, onClear, apiStatus }) {
   const { query } = useApi()
@@ -126,7 +126,6 @@ export default function Chat({ messages, setMessages, onClear, apiStatus }) {
             </svg>
           </button>
         </div>
-        <div className={styles.hint}>Enter to send · Shift+Enter for new line</div>
       </div>
     </main>
   )

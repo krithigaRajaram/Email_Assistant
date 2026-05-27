@@ -1,13 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   --bg:        #0d0d0f;
   --surface:   #141416;
   --surface2:  #1c1c1f;
   --border:    #2a2a2e;
-  --accent:    #e8ff47;
+  --accent:    #cf51ee82;
   --accent2:   #47ffe0;
   --text:      #f0f0f0;
   --muted:     #66666e;

@@ -1,7 +1,10 @@
 .message {
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   animation: slideUp 0.22s ease-out;
-  max-width: 780px; width: 100%;
+  max-width: 780px;
+  width: 100%;
 }
 
 @keyframes slideUp {
@@ -34,16 +37,22 @@
   border-bottom-left-radius: 4px;
 }
 
-/* Actions row */
+/* Action buttons row */
 .meta {
-  display: flex; gap: 6px; align-items: center;
+  display: flex;
+  gap: 6px;
+  align-items: center;
   padding: 0 2px;
-  opacity: 0; transition: opacity 0.15s;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
+
 .message:hover .meta { opacity: 1; }
 
 .actionBtn {
-  display: flex; align-items: center; gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -54,13 +63,16 @@
   cursor: pointer;
   transition: all 0.15s;
 }
-.actionBtn:hover { border-color: var(--accent); color: var(--accent); }
-.actionBtn.copied { border-color: var(--accent2); color: var(--accent2); }
-.actionBtn.active { border-color: var(--accent); color: var(--accent); }
 
-/* Sources */
+.actionBtn:hover        { border-color: var(--accent);  color: var(--accent);  }
+.actionBtn.copied       { border-color: var(--accent2); color: var(--accent2); }
+.actionBtn.active       { border-color: var(--accent);  color: var(--accent);  }
+
+/* Sources panel */
 .sourcesPanel {
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 12px;
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -77,21 +89,30 @@
 }
 
 .sourceSubject {
-  font-size: 12px; font-weight: 500; color: var(--text);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
   margin-bottom: 3px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sourceMeta {
-  font-size: 11px; color: var(--muted);
-  display: flex; gap: 6px; align-items: center;
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
 
 .dot { opacity: 0.4; }
 
 .sourceSnippet {
-  font-size: 11px; color: var(--muted);
-  margin-top: 5px; line-height: 1.5;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 5px;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
