@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
-import useApi from '../hooks/useApi'
+import { fireQuery } from '../App'
 import Message from './Message'
 import styles from '../styles/Chat.module.css'
 
-export default function Chat({ messages, setMessages, onClear, apiStatus }) {
-  const { query } = useApi()
-  const [input, setInput]     = useState('')
+export default function Chat({ messages, setMessages, onClear, apiStatus, query }) {
+  const [input,   setInput]   = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef             = useRef(null)
   const textareaRef           = useRef(null)
 
-  // Auto-scroll on new messages
+  // Scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
@@ -23,40 +22,14 @@ export default function Chat({ messages, setMessages, onClear, apiStatus }) {
     el.style.height = Math.min(el.scrollHeight, 120) + 'px'
   }, [input])
 
-  // When App pushes a suggestion as a user message, fire the query
-  useEffect(() => {
-    const last = messages[messages.length - 1]
-    if (last?.role === 'user' && last?.pending) {
-      fireQuery(last.text, last.id)
-    }
-  }, [messages])
-
   async function send() {
     const text = input.trim()
     if (!text || loading) return
     setInput('')
     const id = Date.now()
-    setMessages(prev => [...prev, { role: 'user', text, id, pending: true }])
-    await fireQuery(text, id)
-  }
-
-  async function fireQuery(text, id) {
-    // Mark user message as no longer pending
-    setMessages(prev => prev.map(m => m.id === id ? { ...m, pending: false } : m))
+    setMessages(prev => [...prev, { role: 'user', text, id }])
     setLoading(true)
-    try {
-      const data = await query(text)
-      setMessages(prev => [...prev, {
-        role: 'bot', text: data.answer,
-        sources: data.sources, id: Date.now()
-      }])
-    } catch {
-      setMessages(prev => [...prev, {
-        role: 'bot',
-        text: '⚠ Could not reach the API. Is uvicorn running on port 8000?',
-        id: Date.now()
-      }])
-    }
+    await fireQuery(text, query, setMessages)
     setLoading(false)
   }
 
@@ -67,21 +40,22 @@ export default function Chat({ messages, setMessages, onClear, apiStatus }) {
     }
   }
 
-  const isEmpty = messages.length === 0
+  const isEmpty = messages.length === 0 && !loading
 
   return (
     <main className={styles.main}>
       <header className={styles.topbar}>
         <button className={styles.clearBtn} onClick={onClear}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/>
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.51"/>
           </svg>
           Clear chat
         </button>
       </header>
 
       <div className={styles.chatArea}>
-        {isEmpty && !loading ? (
+        {isEmpty ? (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>✦</div>
             <h2>What do you want to know<br />about your inbox?</h2>

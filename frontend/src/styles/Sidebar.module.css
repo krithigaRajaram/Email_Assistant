@@ -16,7 +16,7 @@
   gap: 8px;
   margin-bottom: 36px;
   padding: 0 8px;
-  overflow: hidden;        /* prevent blowout */
+  overflow: hidden;       
 }
 
 .logoImg {
@@ -29,10 +29,10 @@
 
 .logoText {
   font-family: var(--font-head);
-  font-size: 16px;         /* slightly smaller to fit */
+  font-size: 16px;         
   font-weight: 800;
   letter-spacing: -0.5px;
-  white-space: nowrap;     /* text stays on one line */
+  white-space: nowrap;     
   overflow: hidden;
   text-overflow: ellipsis;
 }

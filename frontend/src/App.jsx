@@ -1,20 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Sidebar from './components/Sidebar'
 import Chat from './components/Chat'
 import useApi from './hooks/useApi'
-import './styles/index.css'
 import './styles/App.css'
 
 export default function App() {
-  const { status, vectorCount } = useApi()
+  const { status, vectorCount, query } = useApi()
   const [messages, setMessages] = useState([])
 
-  const handleSuggestion = (q) => {
-    // Bubble up to Chat via a shared state trick
-    setMessages(prev => [...prev, { role: 'user', text: q, id: Date.now() }])
+  function handleSuggestion(question) {
+    // Add user message then immediately trigger query
+    const id = Date.now()
+    setMessages(prev => [...prev, { role: 'user', text: question, id }])
+    fireQuery(question, query, setMessages)
   }
 
-  const clearChat = () => setMessages([])
+  function clearChat() {
+    setMessages([])
+  }
 
   return (
     <div className="app">
@@ -29,7 +32,26 @@ export default function App() {
         setMessages={setMessages}
         onClear={clearChat}
         apiStatus={status}
+        query={query}
       />
     </div>
   )
+}
+
+export async function fireQuery(text, query, setMessages) {
+  try {
+    const data = await query(text)
+    setMessages(prev => [...prev, {
+      role: 'bot',
+      text: data.answer,
+      sources: data.sources,
+      id: Date.now(),
+    }])
+  } catch {
+    setMessages(prev => [...prev, {
+      role: 'bot',
+      text: '⚠ Could not reach the API. Is uvicorn running on port 8000?',
+      id: Date.now(),
+    }])
+  }
 }
