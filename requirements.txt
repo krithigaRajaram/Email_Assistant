@@ -1,28 +1,38 @@
 # Core
 python-dotenv
 
-# LangChain
-langchain
-langchain-community
-langchain-openai
-langchain-chroma
-langchain-text-splitters
+# LangChain — all pinned to same core version
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-openai==0.1.23
+langchain-chroma==0.1.2
+langchain-cohere==0.2.4
+langchain-text-splitters==0.2.4
+langchain-core==0.2.43
+langsmith==0.1.147
 
 # Vector Database
-chromadb
+chromadb==0.4.24
 
-# OpenAI (used by GitHub Models via Azure endpoint)
-openai
+# Cohere (embeddings)
+cohere
+
+# OpenAI SDK — pinned to work with langchain-openai 0.1.23
+openai==1.40.0
+
+# httpx pinned to avoid 'proxies' error
+httpx==0.27.0
 
 # Gmail API
-google-auth
-google-auth-oauthlib
-google-auth-httplib2
-google-api-python-client
+google-auth==2.35.0
+google-auth-oauthlib==1.2.1
+google-auth-httplib2==0.2.0
+google-api-python-client==2.149.0
 
 # FastAPI
 fastapi
 uvicorn[standard]
+pydantic
 
 # HTML parsing
 beautifulsoup4==4.12.2

@@ -2,7 +2,6 @@ import base64
 import os
 import pickle
 import re
-from datetime import datetime, timedelta
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -15,8 +14,6 @@ try:
 except ImportError:
     BS4_AVAILABLE = False
     print("Warning: BeautifulSoup not installed. Run: pip install beautifulsoup4")
-
-MAX_EMAILS = 3000  # hard cap per user
 
 
 class GmailFetcher:
@@ -40,91 +37,100 @@ class GmailFetcher:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     "credentials.json", self.SCOPES
                 )
-                creds = flow.run_local_server(port=8080, open_browser=True)
+                flow.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"
+                auth_url, _ = flow.authorization_url(prompt='consent')
+                print("\n" + "="*60)
+                print("GMAIL AUTHENTICATION REQUIRED")
+                print("="*60)
+                print("\n1. Copy and open this URL in your browser:\n")
+                print(auth_url)
+                print("\n2. Sign in with your Google account")
+                print("3. Click Allow")
+                print("4. Google will show you a CODE (short string)")
+                print("="*60)
+                code = input("\nPaste the code here: ").strip()
+                flow.fetch_token(code=code)
+                creds = flow.credentials
 
             with open("token.pickle", "wb") as f:
                 pickle.dump(creds, f)
 
         return build("gmail", "v1", credentials=creds)
 
-    def fetch_all_emails(self, batch_size=100, max_emails=MAX_EMAILS, days=365):
-        """
-        Fetch emails from the past `days` days, up to `max_emails` total.
-        Yields one batch at a time for incremental processing.
-        """
+    def fetch_latest(self, max_emails=300):
+        """Fetch the latest max_emails emails, newest first. Used for initial load."""
+        print(f"Fetching latest {max_emails} emails (newest first)...")
+        emails     = []
         page_token = None
-        total_fetched = 0
 
-        # Build Gmail date query: emails after (today - days)
-        after_date = (datetime.now() - timedelta(days=days)).strftime("%Y/%m/%d")
-        query = f"after:{after_date}"
-
-        print(f"Fetching emails from the past {days} days (limit: {max_emails})...")
-        print(f"  Gmail query: {query}")
-
-        while total_fetched < max_emails:
-            remaining = max_emails - total_fetched
-            fetch_size = min(batch_size, remaining)
-
+        while len(emails) < max_emails:
+            fetch_size = min(100, max_emails - len(emails))
             params = {
                 "userId": "me",
                 "maxResults": fetch_size,
+                "includeSpamTrash": False,
+            }
+            if page_token:
+                params["pageToken"] = page_token
+
+            results  = self.service.users().messages().list(**params).execute()
+            messages = results.get("messages", [])
+            if not messages:
+                break
+
+            for msg in messages:
+                if len(emails) >= max_emails:
+                    break
+                data = self._get_email_content(msg["id"])
+                if data:
+                    emails.append(data)
+
+            print(f"  Fetched {len(emails)}/{max_emails}...")
+            page_token = results.get("nextPageToken")
+            if not page_token or len(emails) >= max_emails:
+                break
+
+        print(f"Done. Total fetched: {len(emails)}")
+        return emails
+
+    def fetch_after(self, after_date_str, batch_size=100):
+        """Fetch emails after after_date_str (YYYY/MM/DD). Yields batches. Used for incremental sync."""
+        query         = f"after:{after_date_str}"
+        page_token    = None
+        total_fetched = 0
+
+        print(f"Incremental sync: fetching emails after {after_date_str}...")
+
+        while True:
+            params = {
+                "userId": "me",
+                "maxResults": batch_size,
                 "q": query,
                 "includeSpamTrash": False,
             }
             if page_token:
                 params["pageToken"] = page_token
 
-            results = self.service.users().messages().list(**params).execute()
+            results  = self.service.users().messages().list(**params).execute()
             messages = results.get("messages", [])
-
             if not messages:
                 break
 
-            batch_emails = []
+            batch = []
             for msg in messages:
-                if total_fetched + len(batch_emails) >= max_emails:
-                    break
-                email_data = self._get_email_content(msg["id"])
-                if email_data:
-                    batch_emails.append(email_data)
+                data = self._get_email_content(msg["id"])
+                if data:
+                    batch.append(data)
 
-            total_fetched += len(batch_emails)
-            print(f"  Fetched {total_fetched}/{max_emails} emails...")
-
-            yield batch_emails
+            total_fetched += len(batch)
+            print(f"  Fetched {total_fetched} new emails so far...")
+            yield batch
 
             page_token = results.get("nextPageToken")
-            if not page_token or total_fetched >= max_emails:
+            if not page_token:
                 break
 
-        print(f"Done. Total emails fetched: {total_fetched}")
-
-    def fetch_emails(self, max_results=500, query="", days=365):
-        """Fetch a fixed number of emails from the past `days` days."""
-        after_date = (datetime.now() - timedelta(days=days)).strftime("%Y/%m/%d")
-        date_query = f"after:{after_date}"
-        combined_query = f"{date_query} {query}".strip()
-        max_results = min(max_results, MAX_EMAILS)
-
-        results = self.service.users().messages().list(
-            userId="me",
-            maxResults=max_results,
-            q=combined_query,
-            includeSpamTrash=False,
-        ).execute()
-
-        messages = results.get("messages", [])
-        if not messages:
-            return []
-
-        emails = []
-        for msg in messages:
-            email_data = self._get_email_content(msg["id"])
-            if email_data:
-                emails.append(email_data)
-
-        return emails
+        print(f"Done. Total new emails fetched: {total_fetched}")
 
     def _get_email_content(self, msg_id):
         try:
